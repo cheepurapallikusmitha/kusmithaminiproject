@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Survey Builder</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f4f6fb;
+}
+
+/* HEADER */
+
+.topbar{
+    background:linear-gradient(135deg,#4f46e5,#9333ea);
+    color:white;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+}
+
+.topbar h1{
+    font-size:30px;
+}
+
+.topbar p{
+    opacity:.9;
+    margin-top:5px;
+}
+
+.header-actions button{
+    padding:12px 20px;
+    border:none;
+    border-radius:10px;
+    margin-left:10px;
+    cursor:pointer;
+    background:rgba(255,255,255,.2);
+    color:white;
+    font-weight:600;
+}
+
+/* LAYOUT */
+
+.container{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+/* FORM */
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    margin-top:12px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    outline:none;
+}
+
+textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+.field-types{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin:20px 0;
+}
+
+.type-card{
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:15px;
+    text-align:center;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.type-card:hover{
+    background:#4f46e5;
+    color:white;
+    transform:translateY(-3px);
+}
+
+.btn-group{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+}
+
+.add-btn{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.clear-btn{
+    background:#ef4444;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.export-btn{
+    width:100%;
+    margin-top:20px;
+    background:linear-gradient(135deg,#4f46e5,#9333ea);
+    color:white;
+    border:none;
+    padding:15px;
+    border-radius:12px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+/* FIELD LIST */
+
+.field-item{
+    background:#f8f9ff;
+    padding:12px;
+    border-radius:12px;
+    margin-top:10px;
+    border-left:4px solid #4f46e5;
+}
+
+.remove{
+    float:right;
+    color:red;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* PREVIEW */
+
+.preview-box{
+    border:1px solid #eee;
+    border-radius:15px;
+    padding:25px;
+    min-height:500px;
+}
+
+.preview-box h3{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.preview-box p{
+    text-align:center;
+    color:#666;
+    margin-bottom:20px;
+}
+
+.submit-btn{
+    margin-top:20px;
+    background:#4f46e5;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:10px;
+    cursor:pointer;
+    float:right;
+}
+
+/* JSON */
+
+pre{
+    margin-top:20px;
+    background:#1f2937;
+    color:#10ff8a;
+    padding:15px;
+    border-radius:12px;
+    overflow:auto;
+    max-height:250px;
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+.container{
+    grid-template-columns:1fr;
+}
+
+.field-types{
+    grid-template-columns:repeat(2,1fr);
+}
+
+.topbar{
+    text-align:center;
+}
+
+.header-actions{
+    margin-top:15px;
+}
+}
+
+</style>
+</head>
+<body>
+
+<header class="topbar">
+
+<div>
+<h1>
+<i class="fa-solid fa-clipboard-list"></i>
+Survey Form Builder
+</h1>
+<p>Create, preview and export beautiful surveys</p>
+</div>
+
+<div class="header-actions">
+<button>
+<i class="fa-solid fa-file-import"></i>
+Import JSON
+</button>
+
+<button>
+<i class="fa-solid fa-floppy-disk"></i>
+Save
+</button>
+</div>
+
+</header>
+
+<div class="container">
+
+<!-- BUILDER -->
+
+<div class="card">
+
+<h2>Build Survey</h2>
+
+<input
+type="text"
+id="question"
+placeholder="Enter your question">
+
+<select id="fieldType">
+<option value="text">Text</option>
+<option value="email">Email</option>
+<option value="number">Number</option>
+<option value="radio">Radio</option>
+<option value="checkbox">Checkbox</option>
+<option value="select">Dropdown</option>
+<option value="textarea">Textarea</option>
+</select>
+
+<textarea
+id="options"
+placeholder="Options (comma separated) for Radio, Checkbox, Dropdown">
+</textarea>
+
+<div class="field-types">
+
+<div class="type-card">📝 Text</div>
+<div class="type-card">📧 Email</div>
+<div class="type-card">🔢 Number</div>
+<div class="type-card">🔘 Radio</div>
+<div class="type-card">☑ Checkbox</div>
+<div class="type-card">📋 Dropdown</div>
+<div class="type-card">📄 Textarea</div>
+<div class="type-card">📅 Date</div>
+
+</div>
+
+<div class="btn-group">
+<button class="add-btn" onclick="addField()">
++ Add Field
+</button>
+
+<button class="clear-btn" onclick="clearAll()">
+Clear
+</button>
+</div>
+
+<h3 style="margin-top:20px;">Survey Fields</h3>
+
+<div id="fieldList"></div>
+
+<button class="export-btn" onclick="exportJSON()">
+⬇ Export JSON
+</button>
+
+<pre id="jsonOutput"></pre>
+
+</div>
+
+<!-- PREVIEW -->
+
+<div class="card">
+
+<h2>Survey Preview</h2>
+
+<div class="preview-box">
+
+<h3>Your Survey Title</h3>
+
+<p>Add a description to your survey</p>
+
+<form id="previewForm"></form>
+
+<button class="submit-btn">
+Submit Survey
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let fields=[];
+
+/* ADD FIELD */
+
+function addField(){
+
+const question=
+document.getElementById("question").value.trim();
+
+const type=
+document.getElementById("fieldType").value;
+
+const options=
+document.getElementById("options")
+.value
+.split(",")
+.map(option=>option.trim())
+.filter(option=>option);
+
+if(question===""){
+alert("Please enter a question");
+return;
+}
+
+fields.push({
+id:Date.now(),
+question,
+type,
+options
+});
+
+renderFields();
+renderPreview();
+
+document.getElementById("question").value="";
+document.getElementById("options").value="";
+}
+
+/* FIELD LIST */
+
+function renderFields(){
+
+let html="";
+
+fields.forEach(field=>{
+
+html+=`
+<div class="field-item">
+${field.question}
+<span class="remove"
+onclick="deleteField(${field.id})">
+✖
+</span>
+</div>
+`;
+
+});
+
+document.getElementById("fieldList").innerHTML=html;
+}
+
+/* DELETE */
+
+function deleteField(id){
+
+fields=
+fields.filter(field=>field.id!==id);
+
+renderFields();
+renderPreview();
+}
+
+/* PREVIEW */
+
+function renderPreview(){
+
+let html="";
+
+fields.forEach(field=>{
+
+html+=`
+<div style="margin-bottom:15px">
+<label>
+<b>${field.question}</b>
+</label>
+`;
+
+if(
+field.type==="text" ||
+field.type==="email" ||
+field.type==="number"
+){
+
+html+=`
+<input type="${field.type}">
+`;
+
+}
+
+else if(field.type==="textarea"){
+
+html+=`
+<textarea></textarea>
+`;
+
+}
+
+else if(field.type==="radio"){
+
+field.options.forEach(option=>{
+
+html+=`
+<div>
+<input
+type="radio"
+name="${field.id}">
+${option}
+</div>
+`;
+
+});
+
+}
+
+else if(field.type==="checkbox"){
+
+field.options.forEach(option=>{
+
+html+=`
+<div>
+<input type="checkbox">
+${option}
+</div>
+`;
+
+});
+
+}
+
+else if(field.type==="select"){
+
+html+=`<select>`;
+
+field.options.forEach(option=>{
+
+html+=`
+<option>${option}</option>
+`;
+
+});
+
+html+=`</select>`;
+}
+
+html+=`</div>`;
+
+});
+
+document.getElementById("previewForm").innerHTML=html;
+}
+
+/* CLEAR */
+
+function clearAll(){
+
+if(confirm("Clear all fields?")){
+
+fields=[];
+
+renderFields();
+renderPreview();
+
+document.getElementById("jsonOutput").textContent="";
+}
+}
+
+/* EXPORT */
+
+function exportJSON(){
+
+const json=
+JSON.stringify(fields,null,4);
+
+document.getElementById("jsonOutput")
+.textContent=json;
+
+const blob=
+new Blob(
+[json],
+{type:"application/json"}
+);
+
+const a=
+document.createElement("a");
+
+a.href=
+URL.createObjectURL(blob);
+
+a.download=
+"survey.json";
+
+a.click();
+}
+
+</script>
+
+</body>
+</html>
